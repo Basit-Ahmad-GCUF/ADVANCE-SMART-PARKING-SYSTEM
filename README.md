@@ -1,4 +1,4 @@
-### Advanced Smart Parking Management System
+# Advanced Smart Parking Management System
 
 ## 1. Project Overview
 
@@ -6,25 +6,25 @@ The Advanced Smart Parking Management System is a robust C++ console application
 
 ## 2. Core Features
 
-# Role-Based Access Control:
+### Role-Based Access Control:
 A secure dual-login portal separates Standard Users (who park and checkout vehicles) from Administrators (who require a masked password for sensitive financial data).
 
-# Dynamic Vehicle Parsing:
+### Dynamic Vehicle Parsing:
 Supports Cars, Bikes, and Trucks with unique base rates.
 
-# Smart Slot Allocation:
+### Smart Slot Allocation:
 Automatically finds available spaces, prioritizing VIP slots for premium members.
 
-# Tiered Memberships:
+### Tiered Memberships:
 Users register with specific validity periods. The system applies dynamic discounts based on remaining validity (e.g., 20% off for >60 days).
 
-# Automated Fee Calculation:
+### Automated Fee Calculation:
 Computes totals using base rates, hours spent, VIP surcharges, late-night fees, and extra-time penalties.
 
-# Administrative Dashboard:
+### Administrative Dashboard:
 Tracks revenue, counts parked vehicle types, and includes a secure database reset.
 
-# Data Persistence:
+### Data Persistence:
 Saves active parking states, member records, and stats to local text files (parked.txt, members.txt, stats.txt).
 
 ## 3. Object-Oriented Architecture
