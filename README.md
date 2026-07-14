@@ -54,3 +54,10 @@ The system architecture leverages OOP pillars to create modular, scalable code.
 ## 5. Future Scope
 
 This system establishes a highly structured backend. The architecture is decoupled—separating UI from business logic—to facilitate a future transition. The next development phase involves porting this backend into Qt Creator, replacing the console with a modern Graphical User Interface (GUI) featuring interactive buttons, dynamic data tables, and visual slot maps.
+
+## 6. Credentials For Login
+
+The Login Credential For Admin are :
+```
+admin123
+```

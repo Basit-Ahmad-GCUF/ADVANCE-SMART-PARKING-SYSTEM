@@ -2,212 +2,67 @@
 #include <conio.h>
 #include <vector>
 #include <string>
-#include <ctime>
 #include <iomanip>
 #include <fstream>
-#include <thread>
-#include <chrono>
 #include <cstdlib>
-#include <limits> 
+#include <limits>
 #include <cctype>
+
+#include "UI.h"
 
 using namespace std;
 
 // ==========================================
-// 1. UI (USER INTERFACE) CLASS
-// ==========================================
-class UI {
-public:
-	static void showWelcomeScreen() {
-        clearScreen();
-        cout << "\n\n\n\n";
-        cout << "\t=========================================================\n";
-        cout << "\t  WELCOME TO MY ADVANCE SMART PARKING MANAGMENT SYSTEM   \n";
-        cout << "\t=========================================================\n\n";
-        cout << "\t                   Developed By: \n";
-        cout << "\t                   -1st Person \n";
-        cout << "\t                   - 2nd Person \n";
-        cout << "\t                   - 3rd Person AYYUB\n\n";
-        cout << "\t=========================================================\n";
-        
-        cout << "\n\t                 Press any key to start it...";
-       _getch();
-    }
-
-    static void showEndingScreen() {
-        clearScreen();
-        cout << "\n\n\n\n";
-        cout << "\t=========================================================\n";
-        cout << "\t      THANK YOU FOR USING THE ADVANCE SMART PARKING SYSTEM       \n";
-        cout << "\t=========================================================\n\n";
-        showLoading("               Saving all files and shutting down", 1500);
-        
-        cout << "\n\t                     System Offline.\n";
-        cout << "\t                        Goodbye!\n\n";
-        cout << "\t=========================================================\n\n";
-        _getch();
-    }
-    static void clearScreen() {
-        system("cls||clear");
-    }
-
-    static void showLoading(string message, int duration_ms = 1500) 
-	{
-        cout << "\n " << message;
-        int steps = 5;
-        int step_delay = duration_ms / steps;
-        
-        for (int i = 0; i < steps; ++i) {
-            cout << ".";
-            cout.flush(); 
-            std::this_thread::sleep_for(std::chrono::milliseconds(step_delay));
-        }
-        cout << " Done\n";
-    }
-
-    static void printHeader() {
-        clearScreen();
-        cout << "=========================================================\n";
-        cout << "         ADVANCE SMART PARKING MANAGMENT SYSTEM          \n";
-        cout << "=========================================================\n";
-        
-        time_t now = time(0);
-        string dt = ctime(&now);
-        cout << "   Live Time: " << dt; 
-        cout << "=========================================================\n";
-    }
-
-    static void openSubWindow(string title) {
-        clearScreen(); 
-        cout << "=========================================================\n";
-        int spaces = (55 - title.length()) / 2;
-        for(int i = 0; i < spaces; i++) cout << " ";
-        cout << title << "\n";
-        cout << "=========================================================\n\n";
-    }
-
-    static int getIntInput(string statement) {
-        int value;
-        while (true) {
-            cout << statement;
-            if (cin >> value) 
-			{
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                break; 
-            } else {
-                cout << " Invalid input! Please type numbers only.\n";
-                cin.clear(); 
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
-            }
-        }
-        return value;
-    }
-
-  
-    static string getStringInput(string statement) {
-        string value;
-        cout << statement;
-        getline(cin, value);
-        return value;
-    }
-    static string getPasswordInput(string statement)
-    {
-    	cout<<statement;
-    	string password="";
-    	char ch;
-    	while ((ch=_getch())!='\r')
-    	{
-    		if(ch=='\b'|| ch==8)
-    		{
-    			if(password.length()>0)
-				{
-					password.pop_back();
-					cout<<"\b \b";
-				}	
-			}
-			else
-			{
-				password+=ch;
-				cout<<'*';
-			}	
-		}
-		cout<<"\n";
-		return password;
-	}
-
-    static char getCharInput(string statement) {
-        char value;
-        cout << statement;
-        cin >> value;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
-        return value;
-    }
-
-
-    static bool isValidPhone(string phone)
-	 {
-        if (phone.length() != 11) return false;
-        for (int i = 0; i < phone.length(); i++)
-	 {
-        if (!isdigit(phone[i])) return false;
-    }   
-        if (phone[0] != '0' || phone[1] != '3') return false; 
-        
-        return true;
-    }
-};
-
-// ==========================================
-// 2. MEMBERSHIP CLASS
+// 1. MEMBERSHIP CLASS
 // ==========================================
 class Membership {
 private:
     int memberId;
-    string ownerName; 
+    string ownerName;
     string ownerNumber;
     bool isVip;
     int validDaysLeft;
 
 public:
-    Membership(int id = 0, string name = "", string num = "", bool vip = false, int days = 0) 
+    Membership(int id = 0, string name = "", string num = "", bool vip = false, int days = 0)
         : memberId(id), ownerName(name), ownerNumber(num), isVip(vip), validDaysLeft(days) {}
-        
+
     int getId() { return memberId; }
-    string getName() { return ownerName; } 
+    string getName() { return ownerName; }
     string getNumber() { return ownerNumber; }
     bool checkVip() { return isVip; }
     int getDays() { return validDaysLeft; }
     bool isValid() { return validDaysLeft > 0; }
 
     double getDiscountPercentage() {
-        if (validDaysLeft > 60) return 0.20;      
-        else if (validDaysLeft > 30) return 0.15; 
-        else if (validDaysLeft > 0) return 0.10;  
-        return 0.0;                               
+        if (validDaysLeft > 60) return 0.20;
+        else if (validDaysLeft > 30) return 0.15;
+        else if (validDaysLeft > 0) return 0.10;
+        return 0.0;
     }
 };
 
 // ==========================================
-// 3. VEHICLE CLASSES (Abstraction & Inheritance)
+// 2. VEHICLE CLASSES (Abstraction & Inheritance)
 // ==========================================
 class Vehicle {
-protected: 
+protected:
     string plateNumber;
-    int expectedDuration; 
-    int memberId; 
+    int expectedDuration;
+    int memberId;
 
 public:
-    Vehicle(string plate, int duration, int mId) 
+    Vehicle(string plate, int duration, int mId)
         : plateNumber(plate), expectedDuration(duration), memberId(mId) {}
-        
-    virtual ~Vehicle() {} 
+
+    virtual ~Vehicle() {}
 
     string getPlate() { return plateNumber; }
     int getExpectedDuration() { return expectedDuration; }
     int getMemberId() { return memberId; }
 
-    virtual string getType() = 0; 
-    virtual double calculateFee(int actualHrs, double penaltyRate) = 0; 
+    virtual string getType() = 0;
+    virtual double calculateFee(int actualHrs, double penaltyRate) = 0;
 };
 
 class Car : public Vehicle {
@@ -250,44 +105,44 @@ public:
 };
 
 // ==========================================
-// 4. PARKING SLOT CLASS
+// 3. PARKING SLOT CLASS
 // ==========================================
 class ParkingSlot {
 private:
     int slotId;
     bool isVipSlot;
-    Vehicle* parkedVehicle; 
+    Vehicle* parkedVehicle;
 
 public:
     ParkingSlot(int id, bool vip) : slotId(id), isVipSlot(vip), parkedVehicle(nullptr) {}
 
     int getId() { return slotId; }
     bool isVip() { return isVipSlot; }
-    bool getStatus() { return parkedVehicle != nullptr; } 
+    bool getStatus() { return parkedVehicle != nullptr; }
     Vehicle* getVehicle() { return parkedVehicle; }
 
     void assignVehicle(Vehicle* v) { parkedVehicle = v; }
-    void freeSlot() { 
-        delete parkedVehicle; 
-        parkedVehicle = nullptr; 
+    void freeSlot() {
+        delete parkedVehicle;
+        parkedVehicle = nullptr;
     }
 };
 
 // ==========================================
-// 5. PARKING SYSTEM CLASS
+// 4. PARKING SYSTEM CLASS
 // ==========================================
 class ParkingSystem {
 private:
     vector<ParkingSlot> slots;
     vector<Membership> members;
-    
-    const double VIP_SURCHARGE = 20.0;   
+
+    const double VIP_SURCHARGE = 20.0;
     const double LATE_NIGHT_FEE = 15.0;
     const double EXTRA_TIME_PENALTY = 10.0;
 
     double dailyRevenue, weeklyRevenue;
     int weeklyCars, weeklyBikes, weeklyTrucks, weeklyVips;
-    const string ADMIN_PASS = "Admin123"; 
+    const string ADMIN_PASS = "admin123";
 
     void loadStats() {
         ifstream file("stats.txt");
@@ -301,7 +156,7 @@ private:
 
     void saveStats() {
         ofstream file("stats.txt");
-        
+
         file << dailyRevenue << " " << weeklyRevenue << " " << weeklyCars << " " << weeklyBikes << " " << weeklyTrucks << " " << weeklyVips;
         file.close();
     }
@@ -321,8 +176,8 @@ private:
         ofstream file("members.txt");
         for (size_t i = 0; i < members.size(); i++) {
             file << members[i].getId()
-			     << " " << members[i].getName() 
-				 << " " << members[i].getNumber() 
+			     << " " << members[i].getName()
+				 << " " << members[i].getNumber()
 				 << " " << members[i].checkVip()
 				 << " " << members[i].getDays() << "\n";
         }
@@ -332,9 +187,9 @@ private:
     void saveParkedVehicles() {
         ofstream file("parked.txt");
         for (size_t i = 0; i < slots.size(); i++) {
-            if (slots[i].getStatus()) { 
+            if (slots[i].getStatus()) {
                 Vehicle* v = slots[i].getVehicle();
-                file << slots[i].getId() << " " << v->getPlate() << " " 
+                file << slots[i].getId() << " " << v->getPlate() << " "
                      << v->getType() << " " << v->getExpectedDuration() << " " << v->getMemberId() << "\n";
             }
         }
@@ -378,73 +233,76 @@ public:
     ParkingSystem() {
         dailyRevenue = 0.0;
         for (int i = 1; i <= 8; i++) slots.push_back(ParkingSlot(i, false));
-        for (int i = 9; i <= 10; i++) slots.push_back(ParkingSlot(i, true)); 
-        loadStats(); loadMembers(); loadParkedVehicles(); 
-    
+        for (int i = 9; i <= 10; i++) slots.push_back(ParkingSlot(i, true));
+        loadStats(); loadMembers(); loadParkedVehicles();
+
 	}
 	bool systemLogin() {
+	    UI::clearScreen();
         while (true) {
             UI::clearScreen();
-            cout << "\n\n\n\n";
+            cout << "\n\n\n\n" << color::b_white;
             cout << "\t=========================================================\n";
-            cout << "\t                  MAIN MENU                   \n";
-            cout << "\t=========================================================\n\n";
+            cout << color::b_green << "\t                  MAIN MENU                   \n" << color::reset;
+            cout << "\t=========================================================\n\n"<< color::b_yellow;
             cout << "\t  [1] Continue as Standard User\n";
             cout << "\t  [2] Login as ADMIN\n";
             cout << "\t  [3] Exit System\n";
-            cout << "\t=========================================================\n\n";
-            
+            cout << color::b_white << "\t=========================================================\n\n";
+
             int choice = UI::getIntInput("\t  Enter choice (1-3): ");
-            
+
             if (choice == 1) {
                 UI::showLoading(" Loading User Interface", 1000);
                 return false;
-            } 
+            }
             else if (choice == 2) {
                 string pass = UI::getPasswordInput("\n\t  Enter Admin Password: ");
                 if (pass == ADMIN_PASS) {
                     UI::showLoading(" Authenticating and loading Admin Dashboard", 1000);
-                    return true; 
+                    return true;
                 } else {
-                    cout << "\n\t  Incorrect Password! Access Denied.\n";
-                    cout << "\t  Press Enter to try again...";
+                    cout << color::b_red << "\n\t  Incorrect Password! Access Denied.\n" << color::reset;
+                    cout << color::b_white << "\t  Press Enter to try again...";
                     cin.get();
                 }
-            } 
+            }
             else if (choice == 3) {
                 UI::showEndingScreen();
-                exit(0); 
-            } 
+                exit(0);
+            }
             else {
-                cout << "\t  Invalid Option. Press Enter to try again...";
+                cout << color::b_red << "\t  Invalid Option. Press Enter to try again..." << color::reset;
                 cin.get();
             }
         }
     }
 
     void showFeeStructure() {
+        UI::clearScreen();
         UI::openSubWindow("FEE STRUCTURE & DISCOUNTS");
-        cout << " [1] Bikes           : $5.00 / hour\n";
+        cout << color::b_yellow << " [1] Bikes           : $5.00 / hour\n";
         cout << " [2] Cars            : $10.00 / hour\n";
         cout << " [3] Trucks          : $15.00 / hour\n";
-        cout << "-----------------------------------------------\n";
-        cout << "  VIP Surcharge   : +$" << VIP_SURCHARGE << " (Priority Slot)\n";
+        cout << color::b_black << "-----------------------------------------------\n";
+        cout << color::b_yellow << "  VIP Surcharge   : +$" << VIP_SURCHARGE << " (Priority Slot)\n";
         cout << "  Late Night Fee  : +$" << LATE_NIGHT_FEE << " (10 PM to 6 AM)\n";
         cout << "  Late Penalty    : +$" << EXTRA_TIME_PENALTY << " / extra hour\n";
-        cout << "-----------------------------------------------\n";
-        cout << "            MEMBERSHIP DISCOUNTS               \n";
-        cout << " >  60 Days Validity : 20% OFF Final Bill\n";
+        cout << color::b_black << "-----------------------------------------------\n";
+        cout << color::b_blue<< "            MEMBERSHIP DISCOUNTS               \n";
+        cout << color::b_yellow << " >  60 Days Validity : 20% OFF Final Bill\n";
         cout << " >  30 Days Validity : 15% OFF Final Bill\n";
         cout << " 1- 30 Days Validity : 10% OFF Final Bill\n";
     }
-    
+
 
     void registerMember() {
+        UI::clearScreen();
         UI::openSubWindow("REGISTER NEW MEMBERSHIP");
-        
+
         int id = UI::getIntInput(" Enter new Member ID (e.g., 000): ");
         if (checkMembership(id) != nullptr) {
-            cout << "\n This ID already exists. Try another.\n"; return;
+            cout << color::b_red << "\n This ID already exists. Try another.\n" << color::reset; return;
         }
 
         string name = UI::getStringInput(" Enter Owner's Name (First & Last): ");
@@ -453,12 +311,12 @@ public:
 		 {
             num = UI::getStringInput("\n Enter Phone Number (11 digits, e.g., 03XXXXXXXXX): ");
             if (UI::isValidPhone(num))
-			 {
+            {
                 break;
             }
-			 else
-			  {
-                cout << "\n Invalid format!  \n";
+            else
+            {
+                cout << color::b_red << "\n Invalid format!  \n" << color::reset;
             }
         }
 
@@ -467,26 +325,27 @@ public:
 
         UI::showLoading(" Encrypting details and saving to database", 1500);
         members.push_back(Membership(id, name, num, (vipChoice == 1), days));
-        saveMembers(); 
-        cout << "\n Membership Registered Successfully for " << name << "!\n";
+        saveMembers();
+        cout << color::b_green << "\n Membership Registered Successfully for " << color::green << name << color::b_white << "!\n";
     }
 
     void parkVehicle() {
+        UI::clearScreen();
         UI::openSubWindow("PARK A VEHICLE");
-        
+
         string plate = UI::getStringInput(" Enter Plate Number: ");
-        string type; 
-        
+        string type;
+
         while (true) {
             type = UI::getStringInput(" Enter Type (Car/Bike/Truck): ");
             if (type == "Car" || type == "car" || type == "Bike" || type == "bike" || type == "Truck" || type == "truck") {
-                break; 
+                break;
             } else {
-                cout << "\n  Haha, nice try! But we definitely do not park '" << type << "'s here.\n";
-                cout << "  Please enter a valid type (Car/Bike/Truck).\n\n";
+                //cout << "\n  Haha, nice try! But we do not park '" << type << "'s here.\n";
+                cout << color::b_red << "  Please enter a valid type (Car/Bike/Truck).\n\n" << color::reset;
             }
         }
-        
+
         int hrs = UI::getIntInput(" Enter Expected Duration (Hours): ");
         int memId = UI::getIntInput(" Enter Membership ID (0 if none): ");
 
@@ -496,12 +355,12 @@ public:
         if (memId != 0) {
             mem = checkMembership(memId);
             if (mem == nullptr) {
-                cout << "\n  Membership ID not found in database\n";
-                return; 
+                cout << color::b_red << "\n  Membership ID not found in database\n" << color::reset;
+                return;
             }
             if (!mem->isValid()) {
-                cout << "\n  Membership is expired! Parking as a standard guest.\n";
-                mem = nullptr; 
+                cout << color::b_red << "\n  Membership is expired! Parking as a standard guest.\n" << color::reset;
+                mem = nullptr;
             }
         }
 
@@ -510,73 +369,74 @@ public:
 		 newVehicle = new Car(plate, hrs, memId);
         else if (type == "Bike" || type == "bike")
 		 newVehicle = new Bike(plate, hrs, memId);
-        else if (type == "Truck" || type == "truck") 
+        else if (type == "Truck" || type == "truck")
 		newVehicle = new Truck(plate, hrs, memId);
 
         bool isUserVip = (mem != nullptr && mem->checkVip());
 
-        if (isUserVip) 
+        if (isUserVip)
 		{
             for (size_t i = 0; i < slots.size(); i++) {
                 if (slots[i].isVip() && !slots[i].getStatus())
 				{
                     slots[i].assignVehicle(newVehicle);
-                    saveParkedVehicles(); 
+                    saveParkedVehicles();
                     cout << "\n Welcome back, " << mem->getName() << " Park in SPECIAL SLOT: " << slots[i].getId() << "\n";
                     return;
                 }
             }
-            cout << "\n VIP Slots are full. Searching for a normal slot...\n";
+            cout << color::b_red << "\n VIP Slots are full. Searching for a normal slot...\n" << color::reset;
         }
 
         for (size_t i = 0; i < slots.size(); i++)
 		 {
             if (!slots[i].isVip() && !slots[i].getStatus()) {
                 slots[i].assignVehicle(newVehicle);
-                saveParkedVehicles(); 
+                saveParkedVehicles();
                 if (mem != nullptr) cout << "\n Welcome, " << mem->getName() << ". Park in NORMAL SLOT: " << slots[i].getId() << "\n";
                 else cout << "\n Guest Vehicle parked in NORMAL SLOT: " << slots[i].getId() << "\n";
                 return;
             }
         }
-        delete newVehicle; 
-        cout << "\n Parking Lot is FULL!\n";
+        delete newVehicle;
+        cout << color::b_red << "\n Parking Lot is FULL!\n" << color::reset;
     }
 
     void viewParkedVehicles() {
+        UI::clearScreen();
         UI::openSubWindow("CURRENT PARKING LOT STATUS");
         bool foundAny = false;
-        
-        cout << left << setw(10) << "Slot" << setw(15) << "Plate No." << setw(10) << "Type" 
+
+        cout << color::b_blue << left << setw(10) << "Slot" << setw(15) << "Plate No." << setw(10) << "Type"
              << setw(12) << "Duration" << "Status\n";
-        cout << "------------------------------------------------------------\n";
-        
+        cout << color::b_black << "------------------------------------------------------------\n";
+
         for (size_t i = 0; i < slots.size(); i++)
 		 {
             if (slots[i].getStatus()) {
                 foundAny = true;
                 Vehicle* v = slots[i].getVehicle();
-                
+
                 string slotName = to_string(slots[i].getId());
                 if (slots[i].isVip()) slotName += " (VIP)";
-                
+
                 string memStatus = "Guest";
                 if (v->getMemberId() != 0) memStatus = "Member (ID: " + to_string(v->getMemberId()) + ")";
 
                 string durationStr = to_string(v->getExpectedDuration()) + " hrs";
 
-                cout << left << setw(10) << slotName << setw(15) << v->getPlate() 
+                cout << color::b_yellow << left << setw(10) << slotName << setw(15) << v->getPlate()
                      << setw(10) << v->getType() << setw(12) << durationStr << memStatus << "\n";
             }
         }
-        
-        if (!foundAny) cout << "\n The parking lot is completely empty right now.\n";
-        else cout << "--------------------------------------------------------------\n";
+
+        if (!foundAny) cout << color::b_red << "\n The parking lot is completely empty right now.\n" << color::reset;
+        else cout << color::b_black << "--------------------------------------------------------------\n";
     }
 
     void exitVehicle() {
         UI::openSubWindow("VEHICLE CHECKOUT");
-        
+
         int slotId = UI::getIntInput(" Enter Slot ID to free: ");
         int actualHrsSpent = UI::getIntInput(" Actual hours spent? ");
 
@@ -584,8 +444,8 @@ public:
 
         for (size_t i = 0; i < slots.size(); i++) {
             if (slots[i].getId() == slotId && slots[i].getStatus()) {
-                Vehicle* v = slots[i].getVehicle(); 
-                
+                Vehicle* v = slots[i].getVehicle();
+
                 double subTotal = v->calculateFee(actualHrsSpent, EXTRA_TIME_PENALTY);
                 double discount = 0.0, finalTotal = 0.0;
 
@@ -598,154 +458,160 @@ public:
 
                 Membership* mem = checkMembership(v->getMemberId());
                 if (mem != nullptr && mem->isValid()) {
-                    discount = subTotal * mem->getDiscountPercentage(); 
+                    discount = subTotal * mem->getDiscountPercentage();
                 }
 
                 finalTotal = subTotal - discount;
                 dailyRevenue += finalTotal; weeklyRevenue += finalTotal;
-                
+
                 string savedPlate = v->getPlate();
                 string savedType = v->getType();
                 string savedName = (mem != nullptr) ? mem->getName() : "Guest";
 
-                slots[i].freeSlot(); 
-                saveStats(); saveParkedVehicles(); 
+                slots[i].freeSlot();
+                saveStats(); saveParkedVehicles();
 
-                cout << "\n========== CHECKOUT RECEIPT ==========\n";
-                cout << " Owner Name    : " << savedName << "\n"; 
-                cout << " Plate Number  : " << savedPlate << "\n";
-                cout << " Vehicle Type  : " << savedType << "\n";
-                cout << " Slot Freed    : " << slotId << "\n";
-                cout << "--------------------------------------\n";
-                cout << " Subtotal      : $" << fixed << setprecision(2) << subTotal << "\n";
-                if (discount > 0) cout << " Mem. Discount : -$" << fixed << setprecision(2) << discount << "\n";
-                cout << "--------------------------------------\n";
-                cout << " FINAL TOTAL   : $" << fixed << setprecision(2) << finalTotal << "\n";
-                cout << "======================================\n";
-                
+                cout << color::b_white << "\n========== CHECKOUT RECEIPT ==========\n";
+                cout << color::b_cyan << " Owner Name    : " << color::b_yellow << savedName << "\n";
+                cout << color::b_cyan << " Plate Number  : " << color::b_yellow << savedPlate << "\n";
+                cout << color::b_cyan << " Vehicle Type  : " << color::b_yellow << savedType << "\n";
+                cout << color::b_cyan << " Slot Freed    : " << color::b_yellow << slotId << "\n";
+                cout << color::b_black << "--------------------------------------\n";
+                cout << color::b_cyan << " Subtotal      : $" << color::b_yellow << fixed << setprecision(2) << subTotal << "\n";
+                if (discount > 0) cout << " Mem. Discount : -$" << color::b_yellow << fixed << setprecision(2) << discount << "\n";
+                cout << color::b_black << "--------------------------------------\n";
+                cout << color::b_cyan << " FINAL TOTAL   : $" << color::b_yellow << fixed << setprecision(2) << finalTotal << "\n";
+                cout << color::b_white << "======================================\n";
+
                 return;
             }
         }
-        cout << "\n Invalid Slot ID or Slot is already empty!\n";
+        cout << color::b_red << "\n Invalid Slot ID or Slot is already empty!\n" << color::reset;
     }
 
     void viewAllMembers() {
+        UI::clearScreen();
         UI::openSubWindow("SECURE MEMBER DATABASE");
-            if (members.empty()) { cout << "\n No members registered.\n"; return; }
-            cout << "\n" << left << setw(10) << "ID" << setw(20) << "Name" << setw(15) << "Phone" << setw(10) << "Type" << "Validity\n";
-            cout << "----------------------------------------------------------------------\n";
+            if (members.empty()) { cout << color::b_red << "\n No members registered.\n" << color::reset; return; }
+            cout << color::b_cyan << "\n" << left << setw(10) << "ID" << setw(20) << "Name" << setw(15) << "Phone" << setw(10) << "Type" << "Validity\n";
+            cout << color::b_black << "----------------------------------------------------------------------\n";
             for (size_t i = 0; i < members.size(); i++) {
                 string type = members[i].checkVip() ? "VIP" : "Normal";
-                cout << left << setw(10) << members[i].getId() << setw(20) << members[i].getName() 
+                cout << color::b_yellow << left << setw(10) << members[i].getId() << setw(20) << members[i].getName()
                      << setw(15) << members[i].getNumber() << setw(10) << type << members[i].getDays() << " days\n";
             }
         }
-	
-    
+
+
 
     void adminPanel() {
+        UI::clearScreen();
         UI::openSubWindow("WEEKLY ADMIN ANALYTICS");
-            cout << "\nTotal Revenue Collected : $" << fixed << setprecision(2) << weeklyRevenue << "\n";
-            cout << " Total Cars Parked       : " << weeklyCars << "\n";
-            cout << " Total Bikes Parked      : " << weeklyBikes << "\n";
-            cout << " Total Trucks Parked     : " << weeklyTrucks << "\n"; 
-            cout << " Total VIP Cars Parked   : "   << weeklyVips << "\n";
-        } 
-    
+            cout << color::b_cyan << "\nTotal Revenue Collected : $" << color::b_blue << fixed << setprecision(2) << weeklyRevenue << "\n";
+            cout << color::b_cyan << " Total Cars Parked       : " << color::b_yellow << weeklyCars << "\n";
+            cout << color::b_cyan << " Total Bikes Parked      : " << color::b_yellow << weeklyBikes << "\n";
+            cout << color::b_cyan << " Total Trucks Parked     : " << color::b_yellow << weeklyTrucks << "\n";
+            cout << color::b_cyan << " Total VIP Cars Parked   : " << color::b_yellow << weeklyVips << "\n";
+        }
+
 
     void clearAllData() {
+        UI::clearScreen();
         UI::openSubWindow("SYSTEM FACTORY RESET");
-            cout << "\n  EXTREME WARNING \n";
-            cout << "\n  Are you absolutely sure you want to permanently delete ALL data? (Y/N): ";
-            char confirm = UI::getCharInput(""); 
-            
+            cout << color::red << "\n\t  < WARNING! > \n";
+            cout << "\n\t  Are you absolutely sure you want to permanently delete ALL data? (Y/N): "<< color::reset;
+            char confirm = UI::getCharInput("");
+
             if ( toupper(confirm)=='Y') {
-                UI::showLoading("Erasing database", 1500);
+                UI::showLoading("\tErasing database", 1500);
                 dailyRevenue = 0.0; weeklyRevenue = 0.0;
                 weeklyCars = 0; weeklyBikes = 0; weeklyTrucks = 0; weeklyVips = 0;
-                members.clear(); 
-                
+                members.clear();
+
                 for(size_t i = 0; i < slots.size(); i++) { slots[i].freeSlot(); }
                 slots.clear();
-                
+
                 for (int i = 1; i <= 8; i++) slots.push_back(ParkingSlot(i, false));
-                for (int i = 9; i <= 10; i++) slots.push_back(ParkingSlot(i, true)); 
-                
-                saveStats(); saveMembers(); saveParkedVehicles(); 
-                cout << "\n  FACTORY RESET COMPLETE.\n";
-            } else { cout << "\n  Factory Reset Cancelled.\n"; }
+                for (int i = 9; i <= 10; i++) slots.push_back(ParkingSlot(i, true));
+
+                saveStats(); saveMembers(); saveParkedVehicles();
+                cout << color::b_green << "\n\t  FACTORY RESET COMPLETE.\n" << color::reset;
+            } else { cout << color::b_green << "\n\t  Factory Reset Cancelled.\n" << color::reset; }
         }
-    
+
 };
 
 
 // ==========================================
-// 6. MAIN FUNCTION
+// 5. MAIN FUNCTION
 // ==========================================
 int main()
  {
-    UI::showWelcomeScreen(); 
+    UI::showWelcomeScreen();
 
     ParkingSystem myParking;
     int choice;
 
     while (true) {
-       
-        bool isAdmin = myParking.systemLogin(); 
-        
-        while (true) {
-            UI::printHeader(); 
-            
-            if (isAdmin) {
-               
-                cout << "   >>> LOGGED IN AS: ADMINISTRATOR <<<\n";
-                cout << "=========================================================\n";
-                cout << "1 > View Members Database\n"; 
-                cout << "2 > View Weekly Stats\n";
-                cout << "3 > Factory Reset / Clear Data\n"; 
-                cout << "4 > Return to Main Menu\n"; 
-                cout << "---------------------------------------------------------\n";
-                
-                choice = UI::getIntInput("Enter choice (1-4): ");
 
-                if      (choice == 1) myParking.viewAllMembers(); 
+        while (true) {
+            UI::printHeader();
+
+            if (myParking.systemLogin()) {
+                UI::clearScreen();
+                cout << color::b_white << "\t=========================================================\n";
+                cout << color::b_cyan << "\t   >>> LOGGED IN AS: ADMINISTRATOR <<<\n";
+                cout << color::b_white << "\t=========================================================\n";
+                cout << color::b_yellow;
+                cout << "\n\t\t1 > View Members Database\n";
+                cout << "\n\t\t2 > View Weekly Stats\n";
+                cout << "\n\t\t3 > Factory Reset / Clear Data\n";
+                cout << "\n\t\t4 > Return to Main Menu\n";
+                cout << color::b_white << "\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+
+                choice = UI::getIntInput("\tEnter choice (1-4): ");
+
+                if      (choice == 1) myParking.viewAllMembers();
                 else if (choice == 2) myParking.adminPanel();
-                else if (choice == 3) myParking.clearAllData(); 
+                else if (choice == 3) myParking.clearAllData();
                 else if (choice == 4) {
-                    UI::showLoading(" Returning to Main Menu", 1000);
-                    break; 
-                } 
-                else { cout << "Invalid Option!\n"; }
+                    UI::showLoading(" \tReturning to Main Menu", 1000);
+                    break;
+                }
+                else { cout << color::b_red << "\tInvalid Option!\n"; }
 
             }
 			 else {
-                
-                cout << "   >>> LOGGED IN AS: STANDARD USER <<<\n";
-                cout << "=========================================================\n";
-                cout << "1 > Park a Vehicle\n";
-                cout << "2 > Checkout / Remove Vehicle\n";
-                cout << "3 > View Currently Parked Vehicles\n"; 
-                cout << "4 > Register New Membership\n";
-                cout << "5 > View Fee Structure & Discounts\n"; 
-                cout << "6 > Return to Main Menu\n"; 
-                cout << "---------------------------------------------------------\n";
-                
+                UI::clearScreen();
+                cout << color::b_white << "\t=========================================================\n";
+                cout << color::b_cyan << "\t   >>> LOGGED IN AS: STANDARD USER <<<\n";
+                cout << color::b_white << "\t=========================================================\n";
+                cout << color::b_yellow;
+                cout << "\n\t\t1 > Park a Vehicle\n";
+                cout << "\n\t\t2 > Checkout / Remove Vehicle\n";
+                cout << "\n\t\t3 > View Currently Parked Vehicles\n";
+                cout << "\n\t\t4 > Register New Membership\n";
+                cout << "\n\t\t5 > View Fee Structure & Discounts\n";
+                cout << "\n\t\t6 > Return to Main Menu\n";
+                cout << color::b_white << "\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+
                 choice = UI::getIntInput("Enter choice (1-6): ");
 
-                if      (choice == 1) myParking.parkVehicle(); 
+                if      (choice == 1) myParking.parkVehicle();
                 else if (choice == 2) myParking.exitVehicle();
-                else if (choice == 3) myParking.viewParkedVehicles(); 
+                else if (choice == 3) myParking.viewParkedVehicles();
                 else if (choice == 4) myParking.registerMember();
-                else if (choice == 5) myParking.showFeeStructure(); 
+                else if (choice == 5) myParking.showFeeStructure();
                 else if (choice == 6) {
                     UI::showLoading(" Returning to Main Menu", 1000);
-                    break; 
-                } 
-                else { cout << "Invalid Option!\n"; }
+                    break;
+                }
+                else { cout << color::red << "Invalid Option!\n" << color::reset; }
             }
-           
-            cout << "\n Press Enter to return to Dashboard...";
-            cin.get();    
+
+            cout << "\n\t\t Press Enter to return to Dashboard...";
+            cin.get();
         }
     }
     return 0;
+ }
